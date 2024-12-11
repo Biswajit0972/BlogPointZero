@@ -2,20 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer utilities {
+    .flex-between {
+        @apply flex justify-between items-center;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.bg-red {
+    @apply bg-red-500;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.embla {
+    overflow: hidden;
+}
+.embla__container {
+    display: flex;
+    gap: 5px;
+}
+.embla__slide {
+    flex: 0 0 110%;
+    min-width: 0;
 }
