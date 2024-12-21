@@ -1,29 +1,20 @@
-import { NextResponse} from "next/server";
-import {responseHandler} from "@/app/_utils/utils";
-import {responseType, verify} from "@/app/_utils/type";
+import {NextRequest, NextResponse} from "next/server";
+import {cookieHandler, responseHandler} from "@/app/_utils/utils";
+import {responseType} from "@/app/_utils/type";
 import {UserModel} from "@/app/_lid/modles/user.model";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
 import mongoose from "mongoose";
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
 
 await dbConnection();
 
-
-async function getUserProfile():Promise<NextResponse<responseType>> {
-
- const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")
-  if (!accessToken) {
-      return NextResponse.json({error: "unauthorized access"}, {status: 401})
-  }
-
-  const {id} =  jwt.verify(accessToken.value, process.env.ACCESS_TOKEN_SECRET_KEY || "") as verify;
+async function getUserProfile(request: NextRequest):Promise<NextResponse<responseType>> {
+    const queryParams = request.nextUrl.searchParams;
+    const id = queryParams.get("id");
+    const ownerId = await cookieHandler();
 
   if (!id) {
       return NextResponse.json({error: "Token is expired, please login again "})
   }
-
 
     const user = await UserModel.aggregate([
      {
@@ -39,18 +30,52 @@ async function getUserProfile():Promise<NextResponse<responseType>> {
              as: "blogPosts"
          }
      },
-     {
-        $project: {
-            _id: 1,
-            name: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            blogPosts: 1,
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "following",
+                as: "subscribers"
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "followers",
+                as: "subscribe"
+            }
+        },
+        {
+            $addFields: {
+                "subscriberCount": {$size: "$subscribers"},
+                "subscribeCount": {$size: "$subscribe"},
+                "isSubscribed": {
+                    $cond: {
+                        if: {$in: [ new mongoose.Types.ObjectId(ownerId), "$subscribers.followers"]},
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                username: 1,
+                fullName: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                blogPosts: 1,
+                subscriberCount: 1,
+                subscribeCount: 1,
+                isSubscribed: 1
+            }
         }
-     }
  ]);
 
-    return NextResponse.json({data: user}, {status: 200})
+    return NextResponse.json({data: user[0]}, {status: 200})
 }
 
 
