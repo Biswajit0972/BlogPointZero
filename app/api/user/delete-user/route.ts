@@ -1,9 +1,9 @@
-import {NextRequest, NextResponse} from "next/server";
+import { NextResponse} from "next/server";
 import {cookieHandler, responseHandler} from "@/app/_utils/utils";
 import {responseType} from "@/app/_utils/type";
 import {UserModel} from "@/app/_lid/modles/user.model";
 
-async function deleteUser (req: NextRequest):Promise<NextResponse<responseType>> {
+async function deleteUser ():Promise<NextResponse<responseType>> {
    const id = await cookieHandler();
 
    if (!id) {
