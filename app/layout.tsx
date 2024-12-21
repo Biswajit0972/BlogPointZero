@@ -5,7 +5,7 @@ import {Merriweather_Sans} from "next/font/google"
 import "./globals.css";
 import DarkProvider from "@/app/_components/DarkProvider";
 import Navbar from "@/app/_components/Navbar";
-
+import {ClerkProvider, SignedOut, SignedIn, UserButton, SignInButton} from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   title: "Youth Tour.",
@@ -36,15 +36,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-    <body
-        className={`${mainHeadingText.className} ${subHeadingText.className} ${contentText.className} max-w-screen-2xl min-h-screen antialiased`}
-    >
-    <DarkProvider>
-      <Navbar ></Navbar>
-    <main className="relative w-full  h-full  px-5 bg-primary-white dark:bg-primary-black text-black dark:text-primary-white">{children}</main>
-    </DarkProvider>
-    </body>
-    </html>
+      <ClerkProvider>
+        <html lang="en" suppressHydrationWarning={true}>
+        <body
+            className={`${mainHeadingText.className} ${subHeadingText.className} ${contentText.className} max-w-screen-2xl min-h-screen antialiased`}
+        >
+        <DarkProvider>
+           <Navbar/>
+            <main
+                className="relative w-full  h-full  px-5 bg-primary-white dark:bg-primary-black text-black dark:text-primary-white">{children}</main>
+        </DarkProvider>
+        </body>
+        </html>
+      </ClerkProvider>
   );
 }

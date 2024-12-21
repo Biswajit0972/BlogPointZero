@@ -22,18 +22,20 @@ const cardStyles = cva(
 interface CardProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardStyles> {
     children?: ReactNode;
     className?: string;
-    data: {heading: string, location:string, image:StaticImageData};
+    data: {heading: string, location:string, image:StaticImageData, category:string};
 }
 
 const Card: FC<CardProps> = ({data, className, variant, ...props}) => {
     return (
         <div className={cn(cardStyles({variant}), className)} {...props}>
-            <div className="image-box h-[85%] w-full relative overflow-hidden rounded-lg">
+
+            <div className="image-box h-[80%] w-full relative overflow-hidden rounded-lg">
                 <Image src={data.image} alt="card image" fill />
             </div>
             <div className="w-full pt-1">
                 <h3 className="font-subHeading-font font-bold text-lg">{data.heading}</h3>
                 <p className="font-heading-font text-sm font-semibold">location: <span className="font-content-font">{data.location}</span></p>
+                <p className="font-heading-font text-sm font-semibold">category: <span className="font-content-font">{data.category}</span></p>
             </div>
         </div>
     )
