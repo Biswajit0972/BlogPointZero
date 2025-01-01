@@ -18,7 +18,7 @@ type fakeData = {
 const Carousel = ({blogData}: {blogData?: fakeData[]} ) => {
 
     const [mounted, setMounted] = useState(false);
-    const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay()])
+    const [emblaRef] = useEmblaCarousel({ loop: true })
 
     useEffect(() => {
         setMounted(true);
@@ -28,13 +28,19 @@ const Carousel = ({blogData}: {blogData?: fakeData[]} ) => {
 
     return (
         <div className="embla overflow-hidden mt-3 h-[94%] w-full relative" ref={emblaRef}>
-            <div className="embla__container min-w-full h-full relative gap-2 px-5 ">
+            <div className="embla__container min-w-full h-full relative gap-5 px-5  bg-red-400">
                 {
-                    blogData!.map((item, index) => (<div key={index} className="embla__slide relative cursor-pointer">
-                      <Card className="h-full relative w-full border-2 rounded-md" data={item}></Card>
-                    </div>))
+                    blogData!.map((item, index) => (
+                            <div key={index} className="embla__slide relative cursor-pointer md:flex-[0_0_auto] md:max-w-[300px] lg:flex-[0_0_80%]">
+                                <Card className="h-full relative w-full border-2 rounded-md" data={item}></Card>
+                            </div>
+
+                        )
+                    )
                 }
             </div>
+
+
 
         </div>
     )

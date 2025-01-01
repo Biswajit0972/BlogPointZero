@@ -15,13 +15,12 @@ interface reqType {
 
 async function createUserSession (request: NextRequest): Promise<NextResponse<responseType>> {
  const {identifier, password} = (await request.json()) as reqType;
-
- const isUserFound = await UserModel.findOne({
+    const isUserFound = await UserModel.findOne({
      $or: [{email: identifier}, {username: identifier}]
  }) as userModel;
 
- if (!isUserFound) {
-     return NextResponse.json({error: "Please, create an account before login"}, {status: 401});
+    if (!isUserFound) {
+     return NextResponse.json({error: "Please, create an account before sign-in"}, {status: 401});
  }
 
  const comparePassword = await bcrypt.compare(password, isUserFound.password);
@@ -40,7 +39,6 @@ async function createUserSession (request: NextRequest): Promise<NextResponse<re
  const response = NextResponse.json({message: "user logged in"}, {status: 200});
  response.cookies.set("accessToken", accessToken, {httpOnly: true, secure: false, sameSite: "strict" });
  response.cookies.set("refreshToken", refreshToken, {httpOnly: true, secure: false, sameSite: "strict"});
-
  return response;
 }
 

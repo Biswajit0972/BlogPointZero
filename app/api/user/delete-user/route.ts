@@ -1,13 +1,19 @@
-import { NextResponse} from "next/server";
-import {cookieHandler, responseHandler} from "@/app/_utils/utils";
+import {NextRequest, NextResponse} from "next/server";
+import {responseHandler} from "@/app/_utils/utils";
 import {responseType} from "@/app/_utils/type";
 import {UserModel} from "@/app/_lid/modles/user.model";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
-async function deleteUser ():Promise<NextResponse<responseType>> {
-   const id = await cookieHandler();
+async function deleteUser (req: NextRequest):Promise<NextResponse<responseType>> {
+    const accessToken = getAccessToken(req);
+    if (accessToken === "Unauthorized!") {
+       return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
+
+   const id = await cookieHandler(accessToken!);
 
    if (!id) {
-     return NextResponse.json({error: "Token is expired, please login again, before delete user account"});
+     return NextResponse.json({error: "Token is expired, please sign-in again, before delete user account"});
    }
 
   const res = await UserModel.findByIdAndDelete(id);

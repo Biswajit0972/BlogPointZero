@@ -1,10 +1,11 @@
 import mongoose, {Schema} from "mongoose";
 import {commentModel, feedBackModel, shareModel} from "@/app/_utils/type";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const commentSchema = new Schema<commentModel>(
     {
         blogId: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Blog",
             required: true,
         },
@@ -12,6 +13,11 @@ const commentSchema = new Schema<commentModel>(
             type: String,
             required: true,
         },
+        userId: {
+            type:Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        }
     },
     {
         timestamps: true,
@@ -33,7 +39,6 @@ const shareSchema = new Schema<shareModel>(
         },
         platform: {
             type: String,
-            required: true,
         },
     },
     {
@@ -42,26 +47,24 @@ const shareSchema = new Schema<shareModel>(
 );
 
 const feedBackSchema = new Schema<feedBackModel>({
-blogId: {
+  blogId: {
     type: Schema.Types.ObjectId,
     ref: "Blog",
-},
-    likeBy: {
+    required: true
+  },
+        likeBy: {
         type: Schema.Types.ObjectId,
-        ref: "User",
-    },
-    comment: {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-    },
-    share: {
-        type: Schema.Types.ObjectId,
-        ref: "Share",
-    }
+        ref: "User"
+     }
 }, {
-timestamps: true
-})
+ timestamps: true
+}
+)
+
+feedBackSchema.plugin(aggregatePaginate);
+commentSchema.plugin(aggregatePaginate);
+shareSchema.plugin(aggregatePaginate);
 
 export const FeedbackModel = mongoose.models.Feedback as mongoose.Model<feedBackModel> || mongoose.model<feedBackModel>("Feedback", feedBackSchema);
-export const CommentModel = mongoose.models.Feedback as mongoose.Model<commentModel> || mongoose.model<commentModel>("Comment", commentSchema);
-export const ShareModel = mongoose.models.Feedback as mongoose.Model<shareModel> || mongoose.model<shareModel>("Share", shareSchema);
+export const CommentModel = mongoose.models.Comment as mongoose.Model<commentModel> || mongoose.model<commentModel>("Comment", commentSchema);
+export const ShareModel = mongoose.models.Share as mongoose.Model<shareModel> || mongoose.model<shareModel>("Share", shareSchema);

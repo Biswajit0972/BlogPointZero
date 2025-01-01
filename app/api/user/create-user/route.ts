@@ -5,14 +5,16 @@ import {UserModel} from "@/app/_lid/modles/user.model";
 import bcrypt from "bcryptjs";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
 
-const createNewUser = async (req: NextRequest): Promise<NextResponse<responseType>> => {
-    await dbConnection();
-    const {username, fullName, password, email} = await req.json()
+await dbConnection();
 
+const createNewUser = async (req: NextRequest): Promise<NextResponse<responseType>> => {
+
+    const {username, fullName, password, email} = await req.json();
+    // checking that all filed  avilable
    if ([username, fullName, password, email].find((item) => item.trim() === "")) {
        throw new Error("Please add all fields");
    }
-
+   // find user from  database using email and username
    const isUserEsist = await  UserModel.findOne({
      $or: [{email}, {username}]
    });

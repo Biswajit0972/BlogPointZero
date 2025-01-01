@@ -1,19 +1,26 @@
 import {NextRequest, NextResponse} from "next/server";
-import {cookieHandler, responseHandler} from "@/app/_utils/utils";
+import { responseHandler} from "@/app/_utils/utils";
 import {responseType} from "@/app/_utils/type";
 import {UserModel} from "@/app/_lid/modles/user.model";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
 import mongoose from "mongoose";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
 await dbConnection();
 
 async function getUserProfile(request: NextRequest):Promise<NextResponse<responseType>> {
+    const accessToken = getAccessToken(request);
+
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
+
     const queryParams = request.nextUrl.searchParams;
     const id = queryParams.get("id");
-    const ownerId = await cookieHandler();
+    const ownerId = await cookieHandler(accessToken!);
 
   if (!id) {
-      return NextResponse.json({error: "Token is expired, please login again "})
+      return NextResponse.json({error: "Token is expired, please sign-in again "})
   }
 
     const user = await UserModel.aggregate([
@@ -26,7 +33,7 @@ async function getUserProfile(request: NextRequest):Promise<NextResponse<respons
          $lookup: {
              from: "blogs",
              localField: "_id",
-             foreignField: "authorId",
+             foreignField: "owner",
              as: "blogPosts"
          }
      },
@@ -75,7 +82,11 @@ async function getUserProfile(request: NextRequest):Promise<NextResponse<respons
         }
  ]);
 
-    return NextResponse.json({data: user[0]}, {status: 200})
+  if (user.length === 0) {
+      return NextResponse.json({error: "User not found"});
+  }
+
+  return NextResponse.json({data: user[0]}, {status: 200})
 }
 
 

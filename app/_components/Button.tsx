@@ -3,12 +3,12 @@ import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/app/_utils/utils";
 
 export const buttonStyles = cva(
-    "transition duration-200 ease-in-out transform hover:scale-105 active:scale-95 px-5 py-2 font-bold rounded-md", {
+    "transition duration-200 ease-in-out transform hover:scale-95  px-5 py-2 font-bold rounded-md h-full w-full", {
         variants: {
             variant: {
                 default: "bg-black text-white dark:bg-white dark:text-black",
                 outline: "border-2 dark:border-primary-white border-primary-black",
-               transparent: "bg-transparent"
+                transparent: "bg-transparent"
             }
         },
         defaultVariants: {

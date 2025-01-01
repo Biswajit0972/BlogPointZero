@@ -6,6 +6,10 @@
     .flex-between {
         @apply flex justify-between items-center;
     }
+
+    .flex-box {
+        @apply h-full w-1/2 flex flex-col items-center justify-center;
+    }
 }
 
 .bg-red {
@@ -17,9 +21,10 @@
 }
 .embla__container {
     display: flex;
-    gap: 5px;
+    justify-content: start;
 }
 .embla__slide {
     flex: 0 0 110%;
     min-width: 0;
+    background: aqua;
 }

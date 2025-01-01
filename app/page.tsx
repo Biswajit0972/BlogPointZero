@@ -1,10 +1,7 @@
 import Home from "@/app/_components/pages/Home";
 import TopDestination from "@/app/_components/TopDestination";
 
-
-
 export default async function Container({searchParams}:{searchParams: Promise<{[key: string]: string}> } ) {
-
     const searchParamsData = (await searchParams);
     const keys = Object.keys(searchParamsData);
     let topDestinationData: string = "";

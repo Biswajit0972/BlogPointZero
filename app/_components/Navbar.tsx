@@ -20,7 +20,7 @@ const Navbar = () => {
 
 
     return (
-        <div className="absolute top-0 left-0 w-full z-50 ">
+        <div className="absolute top-0 left-0 w-full z-50 md:px-12">
             <header className="px-5 py-2 flex-between ">
                 <Logo/>
                 <div className="h-full relative  w-[35%] flex-between  overflow-hidden">
