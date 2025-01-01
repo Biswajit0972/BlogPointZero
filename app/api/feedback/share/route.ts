@@ -3,7 +3,7 @@ import { responseHandler} from "@/app/_utils/utils";
 import { responseType} from "@/app/_utils/type";
 import { ShareModel} from "@/app/_lid/modles/feedback.model";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
-import {cookieHandler} from "@/app/_utils/cookiesHelper";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
 await dbConnection();
 
@@ -16,10 +16,14 @@ async function handleShare(request: NextRequest):Promise<NextResponse<responseTy
     }
 
     const blogId = getParams.get("blogId");
+    const accessToken = getAccessToken(request);
 
-    const userId = await cookieHandler();
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
+    const userId = await cookieHandler(accessToken!);
 
-    if (!userId || !blogId) {
+    if (userId === "unauthorized" || !blogId) {
         return NextResponse.json({error: "please add all details"}, {status: 400});
     }
 

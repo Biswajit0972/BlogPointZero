@@ -3,7 +3,7 @@ import { responseHandler} from "@/app/_utils/utils";
 import { responseType} from "@/app/_utils/type";
 import {FeedbackModel} from "@/app/_lid/modles/feedback.model";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
-import {cookieHandler} from "@/app/_utils/cookiesHelper";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
 await dbConnection();
 
@@ -14,9 +14,16 @@ async function handleLike (request: NextRequest):Promise<NextResponse<responseTy
     if (!getParams) {
         return NextResponse.json({error: "No blog post found, please provide an Id"}, {status: 404});
     }
+    const accessToken = getAccessToken(request);
+
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
+
+
     const blogId = getParams.get("blogId");
 
-    const userId = await cookieHandler();
+    const userId = await cookieHandler(accessToken!);
 
     if (!userId || !blogId) {
         return NextResponse.json({error: "please add all details"}, {status: 400});
