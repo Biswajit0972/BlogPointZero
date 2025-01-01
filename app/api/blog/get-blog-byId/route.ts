@@ -4,20 +4,25 @@ import { responseHandler} from "@/app/_utils/utils";
 import {BlogModel} from "@/app/_lid/modles/blog.model";
 import {dbConnection} from "@/app/_lid/database/dbConnection";
 import mongoose from "mongoose";
-import {cookieHandler} from "@/app/_utils/cookiesHelper";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
 await dbConnection()
 async function getBlogById (request: NextRequest):Promise<NextResponse<responseType>>{
     const paramsData = request.nextUrl.searchParams;
+    const accessToken = getAccessToken(request);
+
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
 
     if (!paramsData) {
         return NextResponse.json({error: "No blog id found"}, {status:404});
     }
     const blogId = paramsData.get("blogId");
 
-    const userId =await cookieHandler();
+    const userId =await cookieHandler(accessToken!);
 
-    if (!userId) {
+    if (userId === "unauthorized") {
         return NextResponse.json({error: "cookie is expired"}, {status: 400});
     }
 

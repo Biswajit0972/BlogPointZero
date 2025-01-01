@@ -2,11 +2,18 @@ import {NextRequest, NextResponse} from "next/server";
 import {blogModel, responseType} from "@/app/_utils/type";
 import {responseHandler} from "@/app/_utils/utils";
 import {BlogModel} from "@/app/_lid/modles/blog.model";
+import {getAccessToken} from "@/app/_utils/cookiesHelper";
 
 async function updateBlogById (request: NextRequest) : Promise<NextResponse<responseType>> {
 
     const queryParams = request.nextUrl.searchParams;
     const blogId = queryParams.get("blogId");
+    const accessToken = getAccessToken(request);
+
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
+
     const {coverImage, content, images, tag, owner, title, isPublished} = await request.json() as blogModel;
 
     if (!blogId) {

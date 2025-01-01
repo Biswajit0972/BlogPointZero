@@ -2,9 +2,13 @@ import {NextRequest, NextResponse} from "next/server";
 import {blogModel, responseType} from "@/app/_utils/type";
 import {BlogModel} from "@/app/_lid/modles/blog.model";
 import { responseHandler} from "@/app/_utils/utils";
-import {cookieHandler} from "@/app/_utils/cookiesHelper";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
 async function createBlog (request: NextRequest): Promise<NextResponse<responseType>> {
+    const accessToken = getAccessToken(request);
+    if (accessToken === "Unauthorized!") {
+        return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+    }
   const {coverImage, content, images, tag, title, isPublished} = await request.json() as blogModel;
 
   if ([coverImage, content, title].find((item) => item.trim() === "")) {
@@ -12,14 +16,14 @@ async function createBlog (request: NextRequest): Promise<NextResponse<responseT
 
   }
 
-  const ownerId = await cookieHandler();
+  const ownerId = await cookieHandler(accessToken!);
+
+    if (!ownerId) {
+        return NextResponse.json({error: "please provide a owner "}, {status: 401})
+    }
 
   if (tag.length == 0 || tag.length == 1) {
    return NextResponse.json({error: "please provide at least two tags."}, {status: 404});
-  }
-
-  if (!ownerId) {
-      return NextResponse.json({error: "please provide a owner "}, {status: 401})
   }
 
   const newBlog = await BlogModel.create({coverImage, content, images, tag, owner: ownerId, title, isPublished});

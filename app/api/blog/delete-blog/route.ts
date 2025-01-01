@@ -2,10 +2,23 @@ import {NextRequest, NextResponse} from "next/server";
 import {responseType} from "@/app/_utils/type";
 import {BlogModel} from "@/app/_lid/modles/blog.model";
 import {responseHandler} from "@/app/_utils/utils";
+import {cookieHandler, getAccessToken} from "@/app/_utils/cookiesHelper";
 
-async function delteBlogPost(requesst: NextRequest):Promise<NextResponse<responseType>> {
+async function delteBlogPost(request: NextRequest):Promise<NextResponse<responseType>> {
+  const accessToken = getAccessToken(request);
 
-  const getParams = requesst.nextUrl.searchParams;
+  if (accessToken === "Unauthorized!") {
+    return NextResponse.json({error: "Unauthorized!"}, {status: 400});
+  }
+
+  const ownerId = await cookieHandler(accessToken!);
+
+  if (ownerId === "unauthorized") {
+    return NextResponse.json({error: "please login first "}, {status: 401})
+  }
+
+  const getParams = request.nextUrl.searchParams;
+
   if (!getParams) {
       return NextResponse.json({error: "No blog post found, please provide an Id"}, {status: 404});
   }
